@@ -1,6 +1,6 @@
 import os
 
-directory = "data/cifar-10/train"
+directory = "vision-transformer/data/cifar-10"
 
 if os.path.exists(directory):
     print("Exists")
