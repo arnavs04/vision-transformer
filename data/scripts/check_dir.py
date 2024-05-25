@@ -1,6 +1,6 @@
 import os
 
-directory = "data/cifar10/train"
+directory = "data/cifar-10/train"
 
 if os.path.exists(directory):
     print("Exists")
