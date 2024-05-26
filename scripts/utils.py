@@ -1,9 +1,12 @@
 """
-Contains various utility functions for PyTorch model training and saving.
+Contains various utility functions for PyTorch model building, training and saving.
 """
 
 import torch
+import numpy as np
 from pathlib import Path
+import math
+import random
 
 def save_model(model: torch.nn.Module,
                target_dir: str,
@@ -34,3 +37,77 @@ def save_model(model: torch.nn.Module,
     print(f"[INFO] Saving model to: {model_save_path}")
     torch.save(obj=model.state_dict(),
              f=model_save_path)
+    
+def number_of_patches(height: int, 
+                      width: int, 
+                      patch_size: int):
+    """Returns the number of patches for a given image size and patch size.
+
+    Args:
+        height (int): The height of the input image.
+        width (int): The width of the input image.
+        patch_size (int): The size of each patch (assuming square patches).
+
+    Returns:
+        int: The number of patches that can be obtained from the input image.
+
+    Example usage:
+        num_patches = number_of_patches(height=256, width=256, patch_size=16)
+        print(num_patches)  # Output: 256
+    """
+    return int((height * width) / patch_size**2)
+
+def embedding_output_shape(height: int, 
+                           width: int, 
+                           patch_size: int, 
+                           channels: int):
+    """Calculates the output shape of an embedding layer based on input image dimensions, patch size, and number of channels.
+
+    Args:
+        height (int): The height of the input image.
+        width (int): The width of the input image.
+        patch_size (int): The size of each patch (assuming square patches).
+        channels (int): The number of channels in the input image.
+
+    Returns:
+        tuple: A tuple representing the output shape (number of patches, patch size squared, number of channels).
+
+    Example usage:
+        output_shape = embedding_output_shape(height=256, width=256, patch_size=16, channels=3)
+        print(output_shape)  # Output: (256, 256, 3)
+    """
+    return (number_of_patches(height, width, patch_size), patch_size**2, channels)
+
+def is_torch_available():
+    """
+    Checks if the PyTorch library is available in the current environment.
+
+    This function attempts to import the PyTorch library and returns True if the import is successful,
+    indicating that PyTorch is available. If the import fails (ImportError is raised), it returns False.
+
+    Returns:
+        bool: True if PyTorch is available, False otherwise.
+    """
+    try:
+        import torch
+        return True
+    except ImportError:
+        return False
+
+    
+def set_seed(seed: int):
+    """
+    Helper function for reproducible behavior to set the seed in ``random``, ``numpy``, ``torch`` and/or ``tf`` (if
+    installed).
+
+    Args:
+        seed (:obj:`int`): The seed to set.
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    if is_torch_available():
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        # ^^ safe to call this function even if cuda is not available
+
+    
