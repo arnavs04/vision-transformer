@@ -3,6 +3,7 @@ Contains various utility functions for PyTorch model building, training and savi
 """
 
 import torch
+from torch import nn
 import numpy as np
 from pathlib import Path
 import math
@@ -110,4 +111,29 @@ def set_seed(seed: int):
         torch.cuda.manual_seed_all(seed)
         # ^^ safe to call this function even if cuda is not available
 
-    
+def count_parameters(model: nn.Module):
+    """
+    Calculate the total number of trainable parameters in a PyTorch model.
+
+    Parameters:
+        model (torch.nn.Module): The PyTorch model whose parameters are to be counted.
+
+    Returns:
+        int: The total number of trainable parameters in the model.
+
+    Examples:
+        >>> import torch
+        >>> import torch.nn as nn
+        >>> class MyModel(nn.Module):
+        ...     def __init__(self):
+        ...         super(MyModel, self).__init__()
+        ...         self.linear = nn.Linear(10, 5)
+        ...         self.conv = nn.Conv2d(3, 6, 3)
+        ...     def forward(self, x):
+        ...         return self.conv(self.linear(x))
+        >>> model = MyModel()
+        >>> count_parameters(model)
+        66
+    """
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+   
