@@ -9,7 +9,9 @@ from pathlib import Path
 import math
 import random
 
-def save_model(model: torch.nn.Module,
+
+
+def save_model(model: nn.Module,
                target_dir: str,
                model_name: str):
     """Saves a PyTorch model to a target directory.
