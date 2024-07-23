@@ -7,7 +7,6 @@ This repository contains an implementation of Vision Transformers (ViTs), a powe
 - [Installation](#installation)
 - [Usage](#usage)
   - [Training](#training)
-  - [Evaluation](#evaluation)
   - [Inference](#inference)
 - [Model Architecture](#model-architecture)
 - [Datasets](#datasets)
