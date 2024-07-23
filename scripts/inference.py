@@ -6,6 +6,8 @@ from io import BytesIO
 import matplotlib.pyplot as plt
 import model_builder
 
+class_names = []
+
 # Define paths
 checkpoint_path = "vision-transformer/models/best_model.pth"
 class_names_path = "vision-transformer/logs/class_names.json"

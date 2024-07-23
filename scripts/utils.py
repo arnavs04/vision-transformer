@@ -9,7 +9,7 @@ from pathlib import Path
 import math
 import random
 import gc
-from fvcore.nn import FlopCountAnalysis, flop_count_table
+from ptflops import get_model_complexity_info
 
 def save_model(model: nn.Module,
                target_dir: str,
@@ -137,17 +137,41 @@ def model_size_mb(model: nn.Module):
     size_in_mb = size_in_bytes / (1024 ** 2)
     return size_in_mb
 
-def model_flops(model: nn.Module, input_size=(1, 3, 256, 256)) -> float: 
+def count_model_flops(model: nn.Module, input_size=(3, 224, 224), print_results=True):
     """
-    Estimates the number of floating-point operations (FLOPs) performed in a forward pass of the model.
+    Calculates and optionally prints the FLOPs (Floating Point Operations) and number of parameters 
+    for a given PyTorch model.
 
     Args:
-        model (nn.Module): The PyTorch model for which to calculate FLOPs.
-        input_size (tuple): The shape of the input tensor, default is (1, 3, 256, 256).
+        model (nn.Module): The target PyTorch model for which to compute the FLOPs and parameters.
+        input_size (tuple, optional): The size of the input tensor. Default is (3, 224, 224), 
+                                       which represents a 3-channel image of size 224x224 pixels.
+        print_results (bool, optional): If True, prints the calculated FLOPs and parameters. 
+                                         Default is True.
 
     Returns:
-        float: The estimated number of FLOPs in billions.
+        tuple: A tuple containing two elements:
+            - gflops (float): The computed FLOPs of the model in GFLOPs (Giga Floating Point Operations).
+            - params (float): The number of parameters in the model in millions (M).
+
+    Notes:
+        - The function uses the `ptflops` library to calculate the number of MACs (Multiply-Accumulate Operations) 
+          and parameters. 
+        - MACs are converted to GFLOPs by dividing by 1e9 (1 billion).
+        - If an error occurs during computation, it will be printed, and the function will return (None, None).
     """
-    input_tensor = torch.randn(input_size)
-    flops = FlopCountAnalysis(model, input_tensor)
-    return flops.total() / (10**9)
+    try:
+        macs, params = get_model_complexity_info(
+            model, input_size, as_strings=False, print_per_layer_stat=False, verbose=False
+        )
+
+        gflops = macs / 1e9  # Convert MACs to GFLOPs
+
+        if print_results:
+            print(f'Computational complexity: {gflops:.3f} GFLOPs')
+            print(f'Number of parameters: {params / 1e6:.3f} M')
+
+        return gflops, params
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return None, None
