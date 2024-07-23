@@ -32,13 +32,6 @@ To train the Vision Transformer model, you can use the train.py script. The foll
 python train.py --config configs/train_config.yaml
 ```
 
-### Evaluation
-To evaluate a pre-trained model, use the evaluate.py script. The following command provides an example:
-
-```bash
-python evaluate.py --model_path models/model.pth --config configs/eval_config.yaml
-```
-
 ### Inference
 For inference on new images, use the inference.py script. Here is an example command:
 
